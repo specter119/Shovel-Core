@@ -2,6 +2,7 @@
 
 ## [0.6.5](https://github.com/Ash258/Scoop-Core/milestone/5)
 
+- Support installation of archives under *nix
 - **psmodules**: Fix uninstallation
 - **Unix**: Use short option for symbolic `ln` calls
 - **scoop-info**: Adopt new resolve function for parameter passing
@@ -15,6 +16,7 @@
     - Support check for administrator on *nix
 - **Update**: Check git availability only if update is needed
 - Present new config options:
+    - `core.preferMoveItem`
     - `commands.cat.defaultFormat`
     - `core.useragent`
 - Add `version` command as alias to `--version`

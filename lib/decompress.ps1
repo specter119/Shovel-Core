@@ -145,7 +145,15 @@ function Expand-7zipArchive {
         $argList = @('x', "`"$Path`"", "-o`"$DestinationPath`"", '-y')
         $isTar = ((strip_ext $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
 
-        if (!$isTar -and $ExtractDir) { $argList += "-ir!`"$ExtractDir\*`"" }
+        if (!$isTar -and $ExtractDir) {
+            if ($SHOVEL_IS_UNIX) {
+                $e = $ExtractDir -replace '\\', '/'
+                # TODO: Watch out for the exapnsion of !, but it should be okay as it is send through System.Diagnostics.Process
+                $argList += "-ir`"`!$e/*`""
+            } else {
+                $argList += "-ir`"!$ExtractDir\*`""
+            }
+        }
         if ($Switches) { $argList += (-split $Switches) }
 
         switch ($Overwrite) {

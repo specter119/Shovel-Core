@@ -56,7 +56,8 @@
         },
         //#endregion Buckets
         {
-            "path": "../../Licenses",
+            "path": "../../Install",
+            "name": "Supporting/Installer"
         },
         {
             "path": "../../Validator",
