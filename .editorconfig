@@ -12,6 +12,9 @@ trim_trailing_whitespace = true
 [*.{yml,yaml}]
 indent_size = 2
 
+[{bin/*,.vscode/*}.ps1]
+end_of_line = lf
+
 [*.*sh]
 end_of_line = lf
 

@@ -2,6 +2,7 @@
 
 ## [0.6.5](https://github.com/Ash258/Scoop-Core/milestone/5)
 
+- **Tests**: Fix detection of 1 new line at the end and allow CRLF/LF for powershell executables
 - **MacOS**: Properly detect arm architecture
 - Support installation of archives under *nix
 - **psmodules**: Fix uninstallation

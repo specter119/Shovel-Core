@@ -25,13 +25,15 @@ function Test-DiagDrive {
 
     $result = $true
 
-    if ((New-Object System.IO.DriveInfo($SCOOP_GLOBAL_ROOT_DIRECTORY)).DriveFormat -ne 'NTFS') {
+    # NTFS for Windows
+    # lofs, apfs for MacOS
+    if ((New-Object System.IO.DriveInfo($SCOOP_GLOBAL_ROOT_DIRECTORY)).DriveFormat -notin ('NTFS', 'lofs', 'apfs')) {
         Write-UserMessage -Message 'Scoop requires an NTFS volume to work!' -Warning
         Write-UserMessage -Message '  Please configure ''SCOOP_GLOBAL'' environment variable to NTFS volume'
         $result = $false
     }
 
-    if ((New-Object System.IO.DriveInfo($SCOOP_ROOT_DIRECTORY)).DriveFormat -ne 'NTFS') {
+    if ((New-Object System.IO.DriveInfo($SCOOP_ROOT_DIRECTORY)).DriveFormat -notin ('NTFS', 'lofs', 'apfs')) {
         Write-UserMessage -Message 'Scoop requires an NTFS volume to work!' -Warning
         Write-UserMessage -Message '  Please install scoop to NTFS volume'
         $result = $false

@@ -1,5 +1,7 @@
 # retain windows line-endings in case checked out on mac or linux
 * text eol=crlf
+bin/*.ps1 eol=lf
+.vscode/*.ps1 eol=lf
 *.exe -text
 *.zip -text
 *.dll -text

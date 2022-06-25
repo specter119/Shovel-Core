@@ -60,8 +60,11 @@ Describe 'Style constraints for non-binary project files' {
             if ($file.Name -eq 'TestResults.xml') { continue }
 
             $string = [System.IO.File]::ReadAllText($file.FullName)
-            # Check for the only 1 newline at the end of the file
-            if (($string.Length -gt 0) -and (($string[-1] -ne "`n") -or ($string[-3] -eq "`n"))) {
+            if ($string.Length -eq 0) { continue }
+
+            # CRLF = `r`n`r`n
+            # LF = `n`n
+            if ((($string[-1..-4] -join '') -eq "`n`r`n`r") -or (($string[-1..-2] -join '') -eq "`n`n")) {
                 $badFiles += $file.FullName
             }
         }
@@ -75,6 +78,8 @@ Describe 'Style constraints for non-binary project files' {
         $badFiles = @()
 
         foreach ($file in $files) {
+            if (($file.Extension -eq '.ps1') -and ($file.Directory.Name -in ('bin', '.vscode'))) { continue }
+
             $content = Get-Content $file.FullName -Raw
             if (!$content) { throw "File contents are null: $($file.FullName)" }
 
