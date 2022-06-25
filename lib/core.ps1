@@ -236,7 +236,10 @@ function Test-IsArmArchitecture {
 
     process {
         if ($SHOVEL_IS_UNIX) {
-            return (Invoke-SystemComSpecCommand -Unix 'uname -m') -like 'aarch*'
+            $uname = Invoke-SystemComSpecCommand -Unix 'uname -m'
+            $expected = if ($IsMacOS) { 'arm*' } else { 'aarch*' }
+
+            return $uname -like $expected
         } else {
             return $env:PROCESSOR_IDENTIFIER -like 'ARMv*'
         }
@@ -1015,12 +1018,13 @@ function success($msg) { Write-UserMessage -Message $msg -Success }
 #       for all communication with api.github.com
 Optimize-SecurityProtocol
 
+# Handle USERPROFILE not existing on MacOS and some linux distros
+if (!$env:USERPROFILE -and $env:HOME) {
+    $env:USERPROFILE = $env:HOME
+}
+
 if (!$env:SCOOP -and !$env:USERPROFILE) {
-    if ($env:HOME) {
-        $env:USERPROFILE = $env:HOME
-    } else {
-        Stop-ScoopExecution -Message "'USERPROFILE' or 'HOME' environment is not configured."
-    }
+    Stop-ScoopExecution -Message "'SCOOP', 'USERPROFILE' or 'HOME' environment is not configured."
 }
 
 # Path gluing has to remain in these global variables to not fail in case user do not have some environment configured (most likely linux case)

@@ -2,6 +2,7 @@
 
 ## [0.6.5](https://github.com/Ash258/Scoop-Core/milestone/5)
 
+- **MacOS**: Properly detect arm architecture
 - Support installation of archives under *nix
 - **psmodules**: Fix uninstallation
 - **Unix**: Use short option for symbolic `ln` calls
