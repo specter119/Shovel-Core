@@ -2,6 +2,7 @@
 
 ## [0.6.5](https://github.com/Ash258/Scoop-Core/milestone/5)
 
+- **Uninstall**: Run `post_uninstall` after current unlinking
 - **Tests**: Fix detection of 1 new line at the end and allow CRLF/LF for powershell executables
 - **MacOS**: Properly detect arm architecture
 - Support installation of archives under *nix

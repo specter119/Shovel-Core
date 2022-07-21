@@ -72,7 +72,6 @@ function Uninstall-ScoopApplication {
 
     Invoke-ManifestScript -Manifest $manifest -ScriptName 'pre_uninstall' -Architecture $architecture
     run_uninstaller $manifest $architecture $dir
-    Invoke-ManifestScript -Manifest $manifest -ScriptName 'post_uninstall' -Architecture $architecture
 
     rm_shims $manifest $Global $architecture
     rm_startmenu_shortcuts $manifest $Global $architecture
@@ -85,6 +84,8 @@ function Uninstall-ScoopApplication {
     uninstall_psmodule $manifest $refdir $Global
     env_rm_path $manifest $refdir $Global $architecture
     env_rm $manifest $Global $architecture
+
+    Invoke-ManifestScript -Manifest $manifest -ScriptName 'post_uninstall' -Architecture $architecture
 
     # Remove older versions
     if ($Older) {
