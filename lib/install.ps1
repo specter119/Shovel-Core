@@ -330,7 +330,11 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         # Handle aria2 console output
         Write-Host 'Starting download with aria2 ...'
 
-        [System.Console]::CursorVisible = $false
+        try {
+            [System.Console]::CursorVisible = $false
+        } catch {
+            # No need to do anything
+        }
         Invoke-Expression $aria2 | ForEach-Object {
             # Skip blank lines
             if ([String]::IsNullOrWhiteSpace($_)) { return }
@@ -354,7 +358,11 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
             Write-Host "`rDownload: $_$blank" -ForegroundColor $color -NoNewline:$noNewLine
         }
         Write-Host ''
-        [System.Console]::CursorVisible = $true
+        try {
+            [System.Console]::CursorVisible = $true
+        } catch {
+            # No need to do anything
+        }
 
         if ($LASTEXITCODE -gt 0) {
             $mes = "Download failed! (Error $LASTEXITCODE) $(aria_exit_code $LASTEXITCODE)"
