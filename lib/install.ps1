@@ -156,7 +156,12 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
 }
 
 function do_dl($url, $to, $cookies) {
-    $progress = ([System.Console]::IsOutputRedirected -eq $false) -and ($Host.name -ne 'Windows PowerShell ISE Host')
+    # TOOD: Add config option
+    $disableProgress = ([System.Console]::IsOutputRedirected -eq $true) -or
+        ($Host.name -eq 'Windows PowerShell ISE Host') -or
+        ($env:CI -eq $true) -or
+        ($env:CI -eq 'true')
+    $progress = !$disableProgress
 
     try {
         $url = handle_special_urls $url
