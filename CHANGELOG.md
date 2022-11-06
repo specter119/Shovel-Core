@@ -2,6 +2,8 @@
 
 ## [0.6.5](https://github.com/Ash258/Scoop-Core/milestone/5)
 
+- **core**: Use `[System.IO.Path]::Combine` for path joining
+- **Download**: Do not show progress in CI by default
 - **Uninstall**: Run `post_uninstall` after current unlinking
 - **Tests**: Fix detection of 1 new line at the end and allow CRLF/LF for powershell executables
 - **MacOS**: Properly detect arm architecture

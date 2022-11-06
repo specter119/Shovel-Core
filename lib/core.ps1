@@ -1023,16 +1023,18 @@ if (!$env:USERPROFILE -and $env:HOME) {
     $env:USERPROFILE = $env:HOME
 }
 
+if (!$env:ProgramData) { $env:ProgramData = '/opt/Shovel' }
+
 if (!$env:SCOOP -and !$env:USERPROFILE) {
     Stop-ScoopExecution -Message "'SCOOP', 'USERPROFILE' or 'HOME' environment is not configured."
 }
 
 # Path gluing has to remain in these global variables to not fail in case user do not have some environment configured (most likely linux case)
 # Scoop root directory
-$SCOOP_ROOT_DIRECTORY = $env:SCOOP, "$env:USERPROFILE\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$SCOOP_ROOT_DIRECTORY = $env:SCOOP, [System.IO.Path]::Combine($env:USERPROFILE, 'scoop') | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop global apps directory
-$SCOOP_GLOBAL_ROOT_DIRECTORY = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$SCOOP_GLOBAL_ROOT_DIRECTORY = $env:SCOOP_GLOBAL, [System.IO.Path]::Combine($env:ProgramData, 'scoop') | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Directory for local buckets
 $SCOOP_BUCKETS_DIRECTORY = Join-Path $SCOOP_ROOT_DIRECTORY 'buckets'
@@ -1042,7 +1044,7 @@ $SCOOP_BUCKETS_DIRECTORY = Join-Path $SCOOP_ROOT_DIRECTORY 'buckets'
 #       is experimental and untested. There may be concurrency issues when
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
-$SCOOP_CACHE_DIRECTORY = $env:SCOOP_CACHE, "$SCOOP_ROOT_DIRECTORY\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$SCOOP_CACHE_DIRECTORY = $env:SCOOP_CACHE, [System.IO.Path]::Combine($SCOOP_ROOT_DIRECTORY, 'cache') | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop directory for powershell modules installtation
 $SCOOP_MODULE_DIRECTORY = Join-Path $SCOOP_ROOT_DIRECTORY 'modules'
