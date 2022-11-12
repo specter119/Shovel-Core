@@ -1,0 +1,26 @@
+{
+    "name": "Shovel Debian dev-container",
+    "image": "mcr.microsoft.com/vscode/devcontainers/base:debian",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/Shovel/apps/scoop/current,type=bind,consistency=cached",
+    "workspaceFolder": "/home/vscode/Shovel/apps/scoop/current",
+    "containerUser": "vscode",
+    "postAttachCommand": "chmod +x ${containerWorkspaceFolder}/.devcontainer/postAttach.sh && . ${containerWorkspaceFolder}/.devcontainer/postAttach.sh",
+    "extensions": [
+        "DavidAnson.vscode-markdownlint",
+        "eamodio.gitlens",
+        "EditorConfig.EditorConfig",
+        "gruntfuggly.todo-tree",
+        "k--kato.intellij-idea-keybindings",
+        "medo64.render-crlf",
+        "ms-vscode.powershell-preview",
+        "redhat.vscode-yaml",
+        "usernamehw.errorlens",
+        "yzhang.markdown-all-in-one"
+    ],
+    "features": {
+        "ghcr.io/devcontainers/features/powershell": {}
+    },
+    "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh"
+    }
+}
