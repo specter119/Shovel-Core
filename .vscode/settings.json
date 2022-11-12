@@ -68,6 +68,13 @@
                 "-NoExit",
             ],
         },
+        "PowerShell Core (Linux)": {
+            "path": "/usr/local/bin/pwsh",
+            "args": [
+                "-NoLogo",
+                "-NoExit",
+            ],
+        },
     },
     "terminal.integrated.windowsEnableConpty": true,
     // #region Language Specific settings

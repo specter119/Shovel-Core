@@ -44,7 +44,7 @@ function Deny-MsiIntallationOnNanoServer {
 
 function Install-ScoopApplication {
     [CmdletBinding()]
-    param($ResolvedObject, [String] $Architecture, [Switch] $Global, $Suggested, [Switch] $UseCache, [Switch] $CheckHash)
+    param($ResolvedObject, [String] $Architecture, [Switch] $Global, $Suggested, [Switch] $UseCache, [Switch] $CheckHash, [PSCustomObject] $InstallationInformation)
 
     process {
         $appName = $ResolvedObject.ApplicationName
@@ -131,7 +131,7 @@ function Install-ScoopApplication {
 
         # Save helper files for uninstall and other commands
         Set-ScoopManifestHelperFile -ResolvedObject $ResolvedObject -Directory $dir
-        Set-ScoopInfoHelperFile -ResolvedObject $ResolvedObject -Architecture $Architecture -Directory $dir
+        Set-ScoopInfoHelperFile -ResolvedObject $ResolvedObject -Architecture $Architecture -Directory $dir -InstallationInformation $InstallationInformation
 
         if ($manifest.suggest) { $Suggested[$appName] = $manifest.suggest }
 
@@ -171,7 +171,7 @@ function Set-ScoopManifestHelperFile {
 
 function Set-ScoopInfoHelperFile {
     [CmdletBinding()]
-    param($ResolvedObject, $Architecture, $Directory)
+    param($ResolvedObject, $Architecture, $Directory, [PSCustomObject] $InstallationInformation)
 
     process {
         $dep = if ($ResolvedObject.Dependency -ne $false) { $ResolvedObject.Dependency } else { $null }
@@ -184,6 +184,14 @@ function Set-ScoopInfoHelperFile {
             'bucket'         = $ResolvedObject.Bucket
             'url'            = if ($url) { "$url" } else { $null } # Force string in case of FileInfo
             'dependency_for' = $dep
+        }
+
+        if ($InstallationInformation) {
+            foreach ($prop in Get-NotePropertyEnumerator -Object $InstallationInformation) {
+                if ($prop.Name -in $info.Keys) { continue } # Skip automatic
+
+                $info.Add($prop.Name, $prop.Value)
+            }
         }
 
         $nulls = $info.Keys | Where-Object { $null -eq $info[$_] }

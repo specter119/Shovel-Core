@@ -78,7 +78,7 @@ Describe 'Style constraints for non-binary project files' {
         $badFiles = @()
 
         foreach ($file in $files) {
-            if (($file.Extension -eq '.ps1') -and ($file.Directory.Name -in ('bin', '.vscode'))) { continue }
+            if (($file.Extension -in ('.ps1', '.sh')) -and ($file.Directory.Name -in ('bin', '.vscode', '.devcontainer'))) { continue }
 
             $content = Get-Content $file.FullName -Raw
             if (!$content) { throw "File contents are null: $($file.FullName)" }

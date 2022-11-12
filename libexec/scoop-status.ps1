@@ -16,6 +16,8 @@
     . (Join-Path $PSScriptRoot "..\lib\${_}.ps1")
 }
 
+# TODO: Rework completely to make it readable and more object like
+
 $ExitCode = 0
 $Failed = @()
 $Outdated = @()
@@ -63,7 +65,9 @@ foreach ($global in ($true, $false)) {
         if ($status.removed) { $Removed += @{ $app = $status.version } }
         if ($status.missing_deps) { $MissingDependencies += , (@($app) + @($status.missing_deps)) }
         if ($status.outdated) {
-            $Outdated += @{ $app = @($status.version, $status.latest_version) }
+            $Outdated += @{
+                $app = @($status.version, $status.latest_version, $status.update_priority)
+            }
             if ($status.hold) { $Onhold += @{ $app = @($status.version, $status.latest_version) } }
         }
         if (($status.install_info.dependency_for) -and ($installedApps -notcontains $status.install_info.dependency_for)) {
@@ -76,9 +80,13 @@ if ($Outdated) {
     $ExitCode = 3
     $pl = pluralize $Outdated.Count 'Update is' 'Updates are'
     Write-UserMessage -Message "$pl available for:" -Color 'DarkCyan'
-    $Outdated.Keys | ForEach-Object {
-        Write-UserMessage -Message "    ${_}: $($Outdated.$_[0]) -> $($Outdated.$_[1])"
-    }
+
+    # Sort by update_priority first as seen in update
+    $Outdated.Keys |
+        Sort-Object @{ 'Expression' = { $Outdated.$_[2] }; 'Descending' = $true }, @{ 'Expression' = { $_ }; 'Descending' = $false } |
+        ForEach-Object {
+            Write-UserMessage -Message "    ${_}: $($Outdated.$_[0]) -> $($Outdated.$_[1])"
+        }
 }
 
 if ($Onhold) {

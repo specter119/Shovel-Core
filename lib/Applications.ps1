@@ -180,6 +180,11 @@ function app_status($app, $global) {
     $status.removed = $false
     $status.url = $install_info.url
 
+    $status.update_priority = 3
+    if ($install_info.update_priority) {
+        $status.update_priority = $install_info.update_priority
+    }
+
     $todo = $app
     if ($install_info.bucket) {
         $todo = "$($install_info.bucket)/$app"

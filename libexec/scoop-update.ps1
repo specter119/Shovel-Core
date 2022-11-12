@@ -5,6 +5,11 @@
 #
 # You can use '*' in place of <APP> to update all applications.
 #
+# Applications will be updated in alphabetical order.
+# To influence this behaviour, you can add property "update_priority" in scoop-install.json.
+# Possible values are from 1 (lowest priority) to 5 (highest priority). Applications are then updated from highest priority to lowest priority.
+# Default priority is 3.
+#
 # Options:
 #   -h, --help                Show help for this command.
 #   -f, --force               Force update even when there is not a newer version.
@@ -63,7 +68,7 @@ if (!$Applications) {
                 if ($status.hold) {
                     Write-UserMessage -Message "'$app' is held to version $($status.version)"
                 } else {
-                    $outdatedApplications += applist $app $global $bb
+                    $outdatedApplications += applist $app $global $bb $status.update_priority
                     $globText = if ($global) { ' (global)' } else { '' }
                     Write-UserMessage -Message "${app}: $($status.version) -> $($status.latest_version)$globText" -Warning -SkipSeverity
                 }
@@ -80,6 +85,11 @@ if (!$Applications) {
             Write-UserMessage -Message "Updating $c outdated ${a}:" -Color 'DarkCyan'
         }
     }
+
+    $outdatedApplications = @(
+        $outdatedApplications |
+            Sort-Object @{ 'Expression' = { $_[3] }; 'Descending' = $true }, @{ 'Expression' = { $_[0] }; 'Descending' = $false }
+    )
 
     foreach ($out in $outdatedApplications) {
         try {

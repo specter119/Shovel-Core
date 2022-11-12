@@ -396,7 +396,7 @@ function Update-App {
     }
 
     Install-ScoopApplication -ResolvedObject $applicationToUpdate -Architecture $architecture -Global:$Global -Suggested:$Suggested `
-        -UseCache:$useCache -CheckHash:$checkHash
+        -UseCache:$useCache -CheckHash:$checkHash -InstallationInformation $install
 }
 
 $__importedUpdate__ = $true

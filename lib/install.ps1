@@ -334,6 +334,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
             [System.Console]::CursorVisible = $false
         } catch {
             # No need to do anything
+            $_ > $null
         }
         Invoke-Expression $aria2 | ForEach-Object {
             # Skip blank lines
@@ -362,6 +363,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
             [System.Console]::CursorVisible = $true
         } catch {
             # No need to do anything
+            $_ > $null
         }
 
         if ($LASTEXITCODE -gt 0) {

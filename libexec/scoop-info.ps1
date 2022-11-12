@@ -130,6 +130,7 @@ if ($Status.installed) {
 $arm64Support = 'No'
 if ($Manifest.architecture.arm64) { $arm64Support = 'Yes' }
 $Message += "arm64 Support: $arm64Support"
+$Message += "Update priority: $($InstallInfo.update_priority)"
 
 $binaries = @(arch_specific 'bin' $Manifest $Architecture)
 if ($binaries) {

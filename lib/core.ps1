@@ -845,10 +845,10 @@ function pluralize($count, $singular, $plural) {
     if ($count -eq 1) { $singular } else { $plural }
 }
 
-# convert list of apps to list of ($app, $global, $bucket) tuples
-function applist($apps, $global, $bucket = $null) {
+# convert list of apps to list of ($app, $global, $bucket, $priority) tuples
+function applist($apps, $global, $bucket = $null, $priority = 3) {
     if (!$apps) { return @() }
-    return , @($apps | ForEach-Object { , @($_, $global, $bucket) })
+    return , @($apps | ForEach-Object { , @($_, $global, $bucket, $priority) })
 }
 
 function parse_app([string] $app) {
@@ -1023,7 +1023,12 @@ if (!$env:USERPROFILE -and $env:HOME) {
     $env:USERPROFILE = $env:HOME
 }
 
-if (!$env:ProgramData) { $env:ProgramData = '/opt/Shovel' }
+if (!$env:ProgramData) {
+    $apD = 'C:\ProgramData'
+    if (Test-IsUnix) { $apD = '/opt' }
+
+    $env:ProgramData = $apD
+}
 
 if (!$env:SCOOP -and !$env:USERPROFILE) {
     Stop-ScoopExecution -Message "'SCOOP', 'USERPROFILE' or 'HOME' environment is not configured."

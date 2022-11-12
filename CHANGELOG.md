@@ -19,7 +19,9 @@
 - Print not supported message only if operation will be executed
 - Prevent repeating administrator checks
     - Support check for administrator on *nix
-- **Update**: Check git availability only if update is needed
+- **Update**:
+    - Support property `update_priority` to influence order of applications while performing update
+    - Check git availability only if update is needed
 - Present new config options:
     - `core.preferMoveItem`
     - `commands.cat.defaultFormat`

@@ -5,6 +5,9 @@
     "workspaceFolder": "/home/vscode/Shovel/apps/scoop/current",
     "containerUser": "vscode",
     "postAttachCommand": "chmod +x ${containerWorkspaceFolder}/.devcontainer/postAttach.sh && . ${containerWorkspaceFolder}/.devcontainer/postAttach.sh",
+    "features": {
+        "ghcr.io/devcontainers/features/powershell": {}
+    },
     "extensions": [
         "DavidAnson.vscode-markdownlint",
         "eamodio.gitlens",
@@ -17,10 +20,11 @@
         "usernamehw.errorlens",
         "yzhang.markdown-all-in-one"
     ],
-    "features": {
-        "ghcr.io/devcontainers/features/powershell": {}
-    },
     "settings": {
-        "terminal.integrated.defaultProfile.linux": "zsh"
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "powershell.powerShellDefaultVersion": "PowerShell Core (Linux)",
+        "powershell.powerShellAdditionalExePaths": {
+            "PowerShell Core (Linux)": "/usr/local/bin/pwsh"
+        }
     }
 }
