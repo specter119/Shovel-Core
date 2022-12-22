@@ -39,3 +39,7 @@ wget --quiet --output-document="${SHOVEL}/shims/shovel.cmd" 'https://raw.githubu
 
 chmod +x "${SHOVEL}/shims/shovel"*
 pwsh --version || sudo chmod +x /usr/local/bin/pwsh
+
+LYQ=/usr/local/bin/yq
+sudo wget -qO $LYQ https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64
+sudo chmod +x $LYQ

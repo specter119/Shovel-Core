@@ -8,3 +8,4 @@ checkver*.html
 *.iso
 /.cache/*
 /.vagrant/*
+/.vscode/*.internal.code-workspace
