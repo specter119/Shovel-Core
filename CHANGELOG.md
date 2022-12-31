@@ -2,6 +2,10 @@
 
 ## [0.6.5](https://github.com/Ash258/Scoop-Core/milestone/5)
 
+- **Schema**:
+    - Better properties descriptions
+    - More strict object validation
+    - Better ergonomics for editing of the schema
 - **core**: Use `[System.IO.Path]::Combine` for path joining
 - **Download**: Do not show progress in CI by default
 - **Uninstall**: Run `post_uninstall` after current unlinking

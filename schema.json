@@ -11,6 +11,28 @@
         "license"
     ],
     "definitions": {
+        "objectWithStringOnly": {
+            "description": "Object with any key and string value",
+            "type": "object",
+            "additionalProperties": false,
+            "minProperties": 1,
+            "patternProperties": {
+                "^(.*)$": {
+                    "type": "string"
+                }
+            }
+        },
+        "objectWithStringOrArrayOfString": {
+            "description": "Object with any key and string or array of strigns as value",
+            "type": "object",
+            "additionalProperties": false,
+            "minProperties": 1,
+            "patternProperties": {
+                "^(.*)$": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                }
+            }
+        },
         "licenseIdentifiers": {
             "description": "SPDX license identifier",
             "type": "string",
@@ -162,7 +184,7 @@
                 },
                 "env_set": {
                     "description": "Specifies environment variables to be set for the user (machine in case --global is used)",
-                    "type": "object"
+                    "$ref": "#/definitions/objectWithStringOnly"
                 }
             }
         },
@@ -413,7 +435,7 @@
             }
         },
         "autoupdate": {
-            "description": "Specifies what properies (and how) should be updated when performing autoupdate.",
+            "description": "Specifies the process of updating manifest with newer version detected by 'checkver'.",
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -465,32 +487,8 @@
                     "type": "string"
                 }
             }
-        }
-    },
-    "properties": {
-        "$schema": {
-            "description": "Path/Url to the json schema used for validation of the json file and extended editors support (intellisense/code-completion)",
-            "type": "string"
         },
-        "##": {
-            "description": "Comment/additional information for other contributors.",
-            "$ref": "#/definitions/stringOrArrayOfStrings"
-        },
-        "version": {
-            "description": "The verison of the application.",
-            "type": "string",
-            "pattern": "^[\\w.\\-+_]+$"
-        },
-        "description": {
-            "description": "Brief description of the application.",
-            "type": "string"
-        },
-        "homepage": {
-            "description": "URL of the application homepage.",
-            "type": "string",
-            "format": "uri"
-        },
-        "license": {
+        "licenseProp": {
             "description": "License information of the application.",
             "anyOf": [
                 {
@@ -516,6 +514,34 @@
                     }
                 }
             ]
+        }
+    },
+    "properties": {
+        "$schema": {
+            "description": "Path/Url to the json schema used for validation of the json file and extended editors support (intellisense/code-completion)",
+            "type": "string"
+        },
+        "##": {
+            "description": "Comment/additional information for other contributors.",
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "version": {
+            "description": "The version of the application.",
+            "type": "string",
+            "pattern": "^[\\w.\\-+_]+$"
+        },
+        "description": {
+            "description": "Brief description of the application.",
+            "type": "string"
+        },
+        "homepage": {
+            "description": "URL of the application homepage.",
+            "type": "string",
+            "format": "uri"
+        },
+        "license": {
+            "description": "License information of the application.",
+            "$ref": "#/definitions/licenseProp"
         },
         "notes": {
             "description": "Information to be displayed to the user after the application is successfully installed.",
@@ -531,14 +557,7 @@
         },
         "suggest": {
             "description": "Specifies manifest(s) with complementary features to be installed.",
-            "type": "object",
-            "additionalProperties": false,
-            "minProperties": 1,
-            "patternProperties": {
-                "^(.*)$": {
-                    "$ref": "#/definitions/stringOrArrayOfStrings"
-                }
-            }
+            "$ref": "#/definitions/objectWithStringOrArrayOfString"
         },
         "pre_download": {
             "description": "PowerShell commands to be executed before download is started.",
@@ -546,8 +565,7 @@
         },
         "cookie": {
             "description": "The cookies required to download the application file(s).",
-            "type": "object",
-            "minProperties": 1
+            "$ref": "#/definitions/objectWithStringOnly"
         },
         "architecture": {
             "description": "Different properties to be used while installing the application on specific architecture.",
@@ -630,7 +648,7 @@
         },
         "env_set": {
             "description": "Environment variable(s) to be set for the user (or machine in case --global) after successful installation.",
-            "type": "object"
+            "$ref": "#/definitions/objectWithStringOnly"
         },
         "persist": {
             "description": "Folder(s) and/or file(s) to be preserved across updates.",
