@@ -11,6 +11,48 @@
         "license"
     ],
     "definitions": {
+        "stringOrArrayOfStrings": {
+            "description": "String or Array of Strings",
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            ]
+        },
+        "stringOrArrayOfStringsOrAnArrayOfArrayOfStrings": {
+            "description": "String or Array of String or Array of nested Array of Strings",
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/stringOrArrayOfStrings"
+                    }
+                }
+            ]
+        },
+        "arrayOfArrayOfStrings": {
+            "description": "Array containing Array containing Strings",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                    "type": "string"
+                }
+            }
+        },
         "objectWithStringOnly": {
             "description": "Object with any key and string value",
             "type": "object",
@@ -32,6 +74,30 @@
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 }
             }
+        },
+        "uriOrArrayOfUris": {
+            "description": "Single URl or Array of URLs",
+            "anyOf": [
+                {
+                    "type": "string",
+                    "format": "uri",
+                    "not": {
+                        "pattern": "(\\$)"
+                    }
+                },
+                {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "format": "uri",
+                        "not": {
+                            "pattern": "(\\$)"
+                        }
+                    }
+                }
+            ]
         },
         "licenseIdentifiers": {
             "description": "SPDX license identifier",
@@ -131,7 +197,7 @@
             "additionalProperties": false,
             "properties": {
                 "pre_download": {
-                    "description": "Specifies PowerShell commands to be executed before download process is executed.",
+                    "description": "PowerShell commands to be executed before download is started.",
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
                 "url": {
@@ -152,7 +218,7 @@
                 },
                 "installer": {
                     "description": "Specifies the process of application installation.",
-                    "$ref": "#/definitions/installer"
+                    "$ref": "#/definitions/installerProp"
                 },
                 "post_install": {
                     "description": "Specifies PowerShell commands to be executed after 'installer' is invoked. (after persist, environment, binaries and shortcuts are created)",
@@ -164,7 +230,7 @@
                 },
                 "uninstaller": {
                     "description": "Specifies the process of application uninstallation.",
-                    "$ref": "#/definitions/uninstaller"
+                    "$ref": "#/definitions/uninstallerProp"
                 },
                 "post_uninstall": {
                     "description": "Specifies the PowerShell commands to be executed after 'uninstaller' is invoked.",
@@ -176,7 +242,7 @@
                 },
                 "shortcuts": {
                     "description": "Specifies Start menu shortcuts to be created after installation.",
-                    "$ref": "#/definitions/shortcutsArray"
+                    "$ref": "#/definitions/shortcutsProp"
                 },
                 "env_add_path": {
                     "description": "Specifies directories to be added into PATH.",
@@ -188,73 +254,78 @@
                 }
             }
         },
-        "arrayOfArrayOfStrings": {
-            "description": "Array containing Array containing Strings",
-            "type": "array",
-            "minItems": 1,
-            "items": {
-                "type": "array",
-                "minItems": 1,
-                "items": {
+        "autoupdateUrl": {
+            "description": "Specifies URL to be updated.",
+            "anyOf": [
+                {
+                    "type": "string",
+                    "format": "uri"
+                },
+                {
+                    "type": "string",
+                    "pattern": "^https?://[\\w/?=&%._${}#-]+"
+                }
+            ]
+        },
+        "autoupdateHashUrl": {
+            "description": "Specifies URL to be updated.",
+            "anyOf": [
+                {
+                    "type": "string",
+                    "$ref": "#/definitions/autoupdateUrl"
+                },
+                {
+                    "type": "string",
+                    "pattern": "^(\\$\\{?(base)?url\\}?).*$"
+                }
+            ]
+        },
+        "autoupdateArchitecture": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "url": {
+                    "description": "Specifies URL to be updated.",
+                    "$ref": "#/definitions/autoupdateUrl"
+                },
+                "hash": {
+                    "description": "Specifies how hashes are extracted.",
+                    "$ref": "#/definitions/hashExtraction"
+                },
+                "extract_dir": {
+                    "description": "Specifies extract directory to be updated.",
                     "type": "string"
                 }
             }
         },
-        "stringOrArrayOfStrings": {
-            "description": "String or Array of Strings",
+        "licenseProp": {
+            "description": "License information of the application.",
             "anyOf": [
                 {
-                    "type": "string"
+                    "description": "SPDX license identifier of the application",
+                    "$ref": "#/definitions/licenseIdentifiers"
                 },
                 {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            ]
-        },
-        "stringOrArrayOfStringsOrAnArrayOfArrayOfStrings": {
-            "description": "String or Array of String or Array of nested Array of Strings",
-            "anyOf": [
-                {
-                    "type": "string"
-                },
-                {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "$ref": "#/definitions/stringOrArrayOfStrings"
-                    }
-                }
-            ]
-        },
-        "uriOrArrayOfUris": {
-            "description": "Single URl or Array of URLs",
-            "anyOf": [
-                {
-                    "type": "string",
-                    "format": "uri",
-                    "not": {
-                        "pattern": "(\\$)"
-                    }
-                },
-                {
-                    "type": "array",
-                    "minItems": 1,
-                    "uniqueItems": true,
-                    "items": {
-                        "type": "string",
-                        "format": "uri",
-                        "not": {
-                            "pattern": "(\\$)"
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "identifier"
+                    ],
+                    "properties": {
+                        "identifier": {
+                            "description": "SPDX license identifier of the application",
+                            "$ref": "#/definitions/licenseIdentifiers"
+                        },
+                        "url": {
+                            "description": "URL of license terms/agreement file",
+                            "type": "string",
+                            "format": "uri"
                         }
                     }
                 }
             ]
         },
-        "shortcutsArray": {
+        "shortcutsProp": {
             "description": "Array containing Array with 2 to 4 Strings",
             "type": "array",
             "minItems": 1,
@@ -267,7 +338,60 @@
                 }
             }
         },
-        "psmodule": {
+        "installerProp": {
+            "description": "Specifies the process/steps required for application to be installed.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "file": {
+                    "description": "Specifies the executable to be executed. Default to $fname (file name of latest downloaded URL)",
+                    "type": "string"
+                },
+                "args": {
+                    "description": "Specifies arguments to be passed to installer file.",
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "keep": {
+                    "description": "Specifies to keep the installer file for future use.",
+                    "type": "boolean"
+                },
+                "script": {
+                    "description": "Specify PowerShell commands required to install application. installer.script will be executed after installer.file. If running file and script sequentially is desired, you need to explicitly specify file or args properties.",
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                }
+            }
+        },
+        "uninstallerProp": {
+            "description": "Specifies the process how the application is uninstalled.",
+            "type": "object",
+            "properties": {
+                "file": {
+                    "description": "Specifies the executable to be executed on uninstallation.",
+                    "type": "string"
+                },
+                "args": {
+                    "description": "Specifies arguments to be passed to uninstaller file.",
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "script": {
+                    "description": "Specifies PowerShell commands required for application uninstallation.",
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                }
+            },
+            "oneOf": [
+                {
+                    "required": [
+                        "file"
+                    ]
+                },
+                {
+                    "required": [
+                        "script"
+                    ]
+                }
+            ]
+        },
+        "psmoduleProp": {
             "type": "object",
             "additionalProperties": false,
             "required": [
@@ -280,7 +404,7 @@
                 }
             }
         },
-        "checkver": {
+        "checkverProp": {
             "description": "Specifies the process of gathering the latest available version of application.",
             "anyOf": [
                 {
@@ -337,104 +461,7 @@
                 }
             ]
         },
-        "installer": {
-            "description": "Specifies the process/steps required for application to be installed.",
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "file": {
-                    "description": "Specifies the executable to be executed. Default to $fname (file name of latest downloaded URL)",
-                    "type": "string"
-                },
-                "args": {
-                    "description": "Specifies arguments to be passed to installer file.",
-                    "$ref": "#/definitions/stringOrArrayOfStrings"
-                },
-                "keep": {
-                    "description": "Specifies to keep the installer file for future use.",
-                    "type": "boolean"
-                },
-                "script": {
-                    "description": "Specify PowerShell commands required to install application. installer.script will be executed after installer.file. If running file and script sequentially is desired, you need to explicitly specify file or args properties.",
-                    "$ref": "#/definitions/stringOrArrayOfStrings"
-                }
-            }
-        },
-        "uninstaller": {
-            "description": "Specifies the process how the application is uninstalled.",
-            "type": "object",
-            "properties": {
-                "file": {
-                    "description": "Specifies the executable to be executed on uninstallation.",
-                    "type": "string"
-                },
-                "args": {
-                    "description": "Specifies arguments to be passed to uninstaller file.",
-                    "$ref": "#/definitions/stringOrArrayOfStrings"
-                },
-                "script": {
-                    "description": "Specifies PowerShell commands required for application uninstallation.",
-                    "$ref": "#/definitions/stringOrArrayOfStrings"
-                }
-            },
-            "oneOf": [
-                {
-                    "required": [
-                        "file"
-                    ]
-                },
-                {
-                    "required": [
-                        "script"
-                    ]
-                }
-            ]
-        },
-        "autoupdateUrl": {
-            "description": "Specifies URL to be updated.",
-            "anyOf": [
-                {
-                    "type": "string",
-                    "format": "uri"
-                },
-                {
-                    "type": "string",
-                    "pattern": "^https?://[\\w/?=&%._${}#-]+"
-                }
-            ]
-        },
-        "autoupdateHashUrl": {
-            "description": "Specifies URL to be updated.",
-            "anyOf": [
-                {
-                    "type": "string",
-                    "$ref": "#/definitions/autoupdateUrl"
-                },
-                {
-                    "type": "string",
-                    "pattern": "^(\\$\\{?(base)?url\\}?).*$"
-                }
-            ]
-        },
-        "autoupdateArchitecture": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "url": {
-                    "description": "Specifies URL to be updated.",
-                    "$ref": "#/definitions/autoupdateUrl"
-                },
-                "hash": {
-                    "description": "Specifies how hashes are extracted.",
-                    "$ref": "#/definitions/hashExtraction"
-                },
-                "extract_dir": {
-                    "description": "Specifies extract directory to be updated.",
-                    "type": "string"
-                }
-            }
-        },
-        "autoupdate": {
+        "autoupdateProp": {
             "description": "Specifies the process of updating manifest with newer version detected by 'checkver'.",
             "type": "object",
             "additionalProperties": false,
@@ -487,33 +514,6 @@
                     "type": "string"
                 }
             }
-        },
-        "licenseProp": {
-            "description": "License information of the application.",
-            "anyOf": [
-                {
-                    "description": "SPDX license identifier of the application",
-                    "$ref": "#/definitions/licenseIdentifiers"
-                },
-                {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                        "identifier"
-                    ],
-                    "properties": {
-                        "identifier": {
-                            "description": "SPDX license identifier of the application",
-                            "$ref": "#/definitions/licenseIdentifiers"
-                        },
-                        "url": {
-                            "description": "URL of license terms/agreement file",
-                            "type": "string",
-                            "format": "uri"
-                        }
-                    }
-                }
-            ]
         }
     },
     "properties": {
@@ -612,7 +612,7 @@
         },
         "installer": {
             "description": "Specifies the process of the application installation.",
-            "$ref": "#/definitions/installer"
+            "$ref": "#/definitions/installerProp"
         },
         "post_install": {
             "description": "PowerShell commands to be executed after 'installer' is invoked (after persist, environment, binaries and shortcuts are processed)",
@@ -624,7 +624,7 @@
         },
         "uninstaller": {
             "description": "Specifies the process of the application uninstallation.",
-            "$ref": "#/definitions/uninstaller"
+            "$ref": "#/definitions/uninstallerProp"
         },
         "post_uninstall": {
             "description": "PowerShell commands to be executed while uninstalling the application. Executed after 'uninstaller' is invoked.",
@@ -632,7 +632,7 @@
         },
         "psmodule": {
             "description": "Manifest will be treated as PowerShell module instead of normal application.",
-            "$ref": "#/definitions/psmodule"
+            "$ref": "#/definitions/psmoduleProp"
         },
         "bin": {
             "description": "Executable(s) to be added $SCOOP/shims after successful installation.",
@@ -640,7 +640,7 @@
         },
         "shortcuts": {
             "description": "Shortcut(s) to be created in start menu after successful installation.",
-            "$ref": "#/definitions/shortcutsArray"
+            "$ref": "#/definitions/shortcutsProp"
         },
         "env_add_path": {
             "description": "Directory(ies) to be added into users (or machine in case --global) PATH.",
@@ -656,11 +656,11 @@
         },
         "checkver": {
             "description": "Specifies the process of gathering the latest available version of the application.",
-            "$ref": "#/definitions/checkver"
+            "$ref": "#/definitions/checkverProp"
         },
         "autoupdate": {
             "description": "Specifies the process of updating manifest with newer version detected by 'checkver'.",
-            "$ref": "#/definitions/autoupdate"
+            "$ref": "#/definitions/autoupdateProp"
         }
     }
 }

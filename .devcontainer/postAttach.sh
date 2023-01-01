@@ -38,8 +38,14 @@ wget --quiet --output-document="${SHOVEL}/shims/shovel.ps1" 'https://raw.githubu
 wget --quiet --output-document="${SHOVEL}/shims/shovel.cmd" 'https://raw.githubusercontent.com/shovel-org/Dockers/main/support/shovel.cmd'
 
 chmod +x "${SHOVEL}/shims/shovel"*
-pwsh --version || sudo chmod +x /usr/local/bin/pwsh
+pwsh --version 2>/dev/null || sudo chmod +x /usr/local/bin/pwsh
 
 LYQ=/usr/local/bin/yq
 sudo wget -qO $LYQ https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64
 sudo chmod +x $LYQ
+
+# Custom scripts
+for fn in "$(find "${SHOVEL_HOME}/.devcontainer/" -iname '*.custom.*sh')"; do
+    chmod +x "$fn"
+    . "$fn"
+done
