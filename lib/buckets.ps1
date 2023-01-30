@@ -134,8 +134,8 @@ function Add-Bucket {
 
     Confirm-DirectoryExistence -LiteralPath $SCOOP_BUCKETS_DIRECTORY | Out-Null
     $bucketDirectory = (Confirm-DirectoryExistence -LiteralPath $bucketDirectory).Path
-    Write-UserMessage -Message 'Cloning bucket repository...' -Output:$false
-    Invoke-GitCmd -Command 'clone' -Argument '--quiet', """$RepositoryUrl""", """$bucketDirectory""" -Proxy
+    Write-UserMessage -Message 'Cloning bucket repository... (this can take a while)' -Output:$false
+    Invoke-GitCmd -Command 'clone' -Argument '--quiet', '--depth', '1', '--no-tags', '--single-branch', """$RepositoryUrl""", """$bucketDirectory""" -Proxy
 
     Write-UserMessage -Message "The $name bucket was added successfully." -Success
 }

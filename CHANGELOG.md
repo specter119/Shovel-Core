@@ -2,6 +2,7 @@
 
 ## [0.6.5](https://github.com/Ash258/Scoop-Core/milestone/5)
 
+- **Buckets**: Clone buckets with `--depth 1` and `--no-tags`
 - **Schema**:
     - Better properties descriptions
     - More strict object validation

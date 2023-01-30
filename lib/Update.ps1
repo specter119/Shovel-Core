@@ -37,7 +37,7 @@ function Update-ScoopCoreClone {
     Write-UserMessage -Message "Cloning scoop installation from $Repo ($Branch)" -Info
 
     $newDir = versiondir 'scoop' 'new'
-    Invoke-GitCmd -Command 'clone' -Argument '--quiet', '--single-branch', '--branch', """$Branch""", $Repo, """$newDir""" -Proxy
+    Invoke-GitCmd -Command 'clone' -Argument '--quiet', '--depth', '1', '--single-branch', '--branch', """$Branch""", $Repo, """$newDir""" -Proxy
 
     # Check if scoop was successful downloaded
     if (!(Test-Path -LiteralPath $newDir -PathType 'Container')) { Stop-ScoopExecution -Message 'Scoop update failed.' }
