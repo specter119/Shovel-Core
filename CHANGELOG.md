@@ -2,6 +2,7 @@
 
 ## [0.6.5](https://github.com/Ash258/Scoop-Core/milestone/5)
 
+- **getopt**: Support multiple same options passed
 - **Config**: Prefer `~/.config/Shovel` over `~/.config/scoop`
 - **Buckets**:
     - Reflect URL change of some buckets

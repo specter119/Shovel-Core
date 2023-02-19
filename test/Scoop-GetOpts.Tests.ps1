@@ -68,4 +68,32 @@ Describe 'getopt' -Tag 'Scoop' {
         $err | Should -BeNullOrEmpty
         $opt.'long-arg' | Should -Be 'test'
     }
+
+    It 'handles multiple long parameters passed' {
+        $a = @(
+            'INSTALL=1',
+            'CLEAN=1',
+            'STR=string',
+            'KEY=value'
+        )
+
+        $opt, $null, $err = Resolve-GetOpt ($a | ForEach-Object { '--parameters', $_ }) 'p' 'parameters='
+        foreach ($i in 0..3) {
+            $opt.parameters[$i] | Should -Be $a[$i]
+        }
+    }
+
+    It 'Handle multiple short parameters passed' {
+        $a = @(
+            'INSTALL=1',
+            'CLEAN=1',
+            'STR=string',
+            'KEY=value'
+        )
+
+        $opt, $null, $err = Resolve-GetOpt ($a | ForEach-Object { '-p', $_ }) 'p:' 'parameters='
+        foreach ($i in 0..3) {
+            $opt.p[$i] | Should -Be $a[$i]
+        }
+    }
 }

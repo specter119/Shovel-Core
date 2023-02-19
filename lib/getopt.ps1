@@ -15,6 +15,7 @@ $__importedGetopt__ = $false
 #    array of strings that are long-form options. options that take
 #    a parameter should end with '='
 # returns @(opts hash, remaining_args array, error string)
+# TODO: Add support for -vv => $opt.$name++
 function Resolve-GetOpt($argv, $shortopts, $longopts) {
     $opts = @{ }
     $rem = @()
@@ -27,50 +28,58 @@ function Resolve-GetOpt($argv, $shortopts, $longopts) {
     $argv = @($argv)
     $longopts = @($longopts)
 
-    for ($i = 0; $i -lt $argv.length; $i++) {
+    for ($i = 0; $i -lt $argv.Length; $i++) {
         $arg = $argv[$i]
         if ($null -eq $arg) { continue }
         # Don't try to parse array arguments
-        if ($arg -is [array]) { $rem += , $arg; continue }
-        if ($arg -is [int]) { $rem += $arg; continue }
-        if ($arg -is [decimal]) { $rem += $arg; continue }
-        if ($arg -is [boolean]) { $rem += $arg; continue }
+        if ($arg -is [Array]) { $rem += , $arg; continue }
+        if ($arg -is [Int]) { $rem += $arg; continue }
+        if ($arg -is [Decimal]) { $rem += $arg; continue }
+        if ($arg -is [Boolean]) { $rem += $arg; continue }
         if ($arg -is [System.Collections.Hashtable]) { $rem += $arg; continue }
 
         if ($arg.startswith('--')) {
-            $name = $arg.substring(2)
-
+            $name = $arg.Substring(2)
             $longopt = $longopts | Where-Object { $_ -match "^$name=?$" }
 
-            if ($longopt) {
-                if ($longopt.endswith('=')) {
-                    # Requires arg
-                    if ($i -eq $argv.length - 1) {
-                        return err "Option --$name requires an argument."
+            if (!$longopt) { return err "Option --$name not recognized." }
+
+            if ($longopt.EndsWith('=')) {
+                # Requires arg
+                if ($i -eq $argv.Length - 1) { return err "Option --$name requires an argument." }
+
+                if ($opts.$name) {
+                    if ($opts.$name -is [String]) {
+                        $opts.$name = @($opts.$name)
                     }
-                    $opts.$name = $argv[++$i]
+                    $opts.$name += $argv[++$i]
                 } else {
-                    $opts.$name = $true
+                    $opts.$name = $argv[++$i]
                 }
             } else {
-                return err "Option --$name not recognized."
+                $opts.$name = $true
             }
-        } elseif ($arg.startswith('-') -and $arg -ne '-') {
-            for ($j = 1; $j -lt $arg.length; $j++) {
-                $letter = $arg[$j].tostring()
+        } elseif ($arg.StartsWith('-') -and $arg -ne '-') {
+            for ($j = 1; $j -lt $arg.Length; $j++) {
+                $letter = $arg[$j].ToString()
 
-                if ($shortopts -match "$(regex_escape $letter)`:?") {
-                    $shortopt = $matches[0]
-                    if ($shortopt[1] -eq ':') {
-                        if ($j -ne $arg.length - 1 -or $i -eq $argv.length - 1) {
-                            return err "Option -$letter requires an argument."
+                if ($shortopts -notmatch "$(regex_escape $letter):?") { return err "Option -$letter not recognized." }
+
+                $shortopt = $Matches[0]
+                if ($shortopt[1] -eq ':') {
+                    if ($j -ne $arg.Length - 1 -or $i -eq $argv.Length - 1) {
+                        return err "Option -$letter requires an argument."
+                    }
+                    if ($opts.$letter) {
+                        if ($opts.$letter -is [String]) {
+                            $opts.$letter = @($opts.$letter)
                         }
-                        $opts.$letter = $argv[++$i]
+                        $opts.$letter += $argv[++$i]
                     } else {
-                        $opts.$letter = $true
+                        $opts.$letter = $argv[++$i]
                     }
                 } else {
-                    return err "Option -$letter not recognized."
+                    $opts.$letter = $true
                 }
             }
         } else {
