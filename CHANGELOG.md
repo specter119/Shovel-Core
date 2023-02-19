@@ -3,7 +3,9 @@
 ## [0.6.5](https://github.com/Ash258/Scoop-Core/milestone/5)
 
 - **Config**: Prefer `~/.config/Shovel` over `~/.config/scoop`
-- **Buckets**: Clone buckets with `--depth 1` and `--no-tags`
+- **Buckets**:
+    - Reflect URL change of some buckets
+    - Clone buckets with `--depth 1` and `--no-tags`
 - **Schema**:
     - Better properties descriptions
     - More strict object validation

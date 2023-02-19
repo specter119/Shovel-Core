@@ -10,9 +10,10 @@ $REPOSITORIES = @(
     @('shovel-org/Validator', 'Validator'),
     @('shovel-org/Shim', 'Shim'),
     @('shovel-org/Base', 'Base'),
-    @('shovel-org/Sysinternals-Bucket', 'Sysinternals'),
-    @('Ash258/Scoop-NirSoft', 'NirSoft'),
-    @('Ash258/Scoop-JetBrains', 'JetBrains'),
+    @('shovel-org/Windows-Sysinternals-Bucket', 'Sysinternals'),
+    @('shovel-org/Windows-NirSoft-Bucket', 'NirSoft'),
+    @('shovel-org/Windows-JetBrains-Bucket', 'JetBrains'),
+    @('shovel-org/Linux-Base-Bucket', 'Base-Linux'),
     @('Ash258/Shovel-Licenses', 'Licenses'),
     @('Ash258/Shovel-Ash258', 'Ash258'),
     @('Ash258/GithubActionsBucketForTesting', 'GithubActionsBucketForTesting')

@@ -15,69 +15,83 @@
     "folders": [
         {
             "path": "../",
-            "name": "Shovel",
+            "name": "Ash258/Shovel (Powershell-POC)"
         },
         {
             "path": "../../GenericBucket",
-            "name": "Buckets/Generic",
-        },
-        //#region Buckets
-        {
-            "path": "../../Ash258",
-            "name": "Buckets/Ash258",
-        },
-        {
-            "path": "../../JetBrains",
-            "name": "Buckets/JetBrains",
-        },
-        {
-            "path": "../../Sysinternals",
-            "name": "Buckets/Sysinternals",
-        },
-        {
-            "path": "../../NirSoft",
-            "name": "Buckets/NirSoft",
+            "name": "shovel-org/Buckets/Generic"
         },
         {
             "path": "../../Base",
-            "name": "Buckets/Base",
+            "name": "shovel-org/Buckets/Windows/Base"
         },
         {
-            "path": "../../Extras",
-            "name": "Buckets/Extras",
+            "path": "../../Base-Linux",
+            "name": "shovel-org/Buckets/Linux/Base"
         },
         {
-            "path": "../../Main",
-            "name": "Buckets/Main",
+            "path": "../../Base-Mac",
+            "name": "shovel-org/Buckets/Mac/Base"
         },
         {
-            "path": "../../Ash258",
-            "name": "Buckets/Ash258",
+            "path": "../../JetBrains",
+            "name": "shovel-org/Buckets/Windows/JetBrains"
         },
-        //#endregion Buckets
         {
-            "path": "../../Install",
-            "name": "Supporting/Installer"
+            "path": "../../Sysinternals",
+            "name": "shovel-org/Buckets/Windows/Sysinternals"
+        },
+        {
+            "path": "../../NirSoft",
+            "name": "shovel-org/Buckets/Windows/NirSoft"
         },
         {
             "path": "../../Validator",
-            "name": "Supporting/Validator",
+            "name": "shovel-org/Supporting/Validator"
         },
         {
             "path": "../../Shim",
-            "name": "Supporting/Shim",
+            "name": "shovel-org/Supporting/Shim"
         },
         {
             "path": "../../GithubActions",
-            "name": "Supporting/Github Actions",
+            "name": "shovel-org/Supporting/Github Actions"
         },
         {
             "path": "../../Vagrants",
-            "name": "Supporting/Vagrants"
+            "name": "shovel-org/Supporting/Vagrants"
         },
         {
             "path": "../../Dockers",
-            "name": "Supporting/Dockers"
+            "name": "shovel-org/Supporting/Dockers"
+        },
+        {
+            "path": "../../Install",
+            "name": "shovel-org/Supporting/Install"
+        },
+        {
+            "path": "../../Ash258",
+            "name": "Ash258/Buckets/Windows/Ash258"
+        },
+        {
+            "path": "../../GithubActionsForBucketTesting",
+            "name": "Ash258/Buckets/ActionsTesting"
+        },
+        {
+            "path": "../../Licenses",
+            "name": "Ash258/Supporting/License"
+        },
+        {
+            "path": "../../Extras",
+            "name": "Scoop/Buckets/Extras"
+        },
+        {
+            "path": "../../Main",
+            "name": "Scoop/Buckets/Windows/Main"
+        },
+        {
+            "path": "../../dev-container-features",
+            "name": "Ash258/Supporting/Container Features"
         },
     ],
     "settings": {
