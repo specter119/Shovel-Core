@@ -6,7 +6,10 @@
     "containerUser": "vscode",
     "postAttachCommand": "chmod +x ${containerWorkspaceFolder}/.devcontainer/postAttach.sh && . ${containerWorkspaceFolder}/.devcontainer/postAttach.sh",
     "features": {
-        "ghcr.io/devcontainers/features/powershell": {}
+        "ghcr.io/devcontainers/features/powershell": {},
+        "ghcr.io/devcontainers/features/rust": {
+            "profile": "default"
+        }
     },
     "extensions": [
         "DavidAnson.vscode-markdownlint",

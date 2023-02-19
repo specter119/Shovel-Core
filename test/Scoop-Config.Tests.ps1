@@ -32,7 +32,7 @@ Describe 'config' -Tag 'Scoop' {
     }
 
     It 'get_config should return exactly the same values' {
-        $SCOOP_CONFIGURATION = ConvertFrom-Json $json
+        $SHOVEL_CONFIGURATION = ConvertFrom-Json $json
         get_config 'does_not_exist' 'default' | Should -Be 'default'
 
         get_config 'one' | Should -BeExactly 1
@@ -52,11 +52,11 @@ Describe 'config' -Tag 'Scoop' {
 
     <#
     It "set_config should create a new PSObject and ensure existing directory" {
-        $SCOOP_CONFIGURATION = $null
-        $SCOOP_CONFIGURATION_FILE = "$PSScriptRoot\.scoop"
+        $SHOVEL_CONFIGURATION = $null
+        $SHOVEL_CONFIGURATION_FILE = "$PSScriptRoot\.scoop"
 
-        Mock ensure { $PSScriptRoot } -Verifiable -ParameterFilter { $dir -eq (Split-Path -Path $SCOOP_CONFIGURATION_FILE) }
-        Mock Set-Content { } -Verifiable -ParameterFilter { $Path -eq $SCOOP_CONFIGURATION_FILE }
+        Mock ensure { $PSScriptRoot } -Verifiable -ParameterFilter { $dir -eq (Split-Path -Path $SHOVEL_CONFIGURATION_FILE) }
+        Mock Set-Content { } -Verifiable -ParameterFilter { $Path -eq $SHOVEL_CONFIGURATION_FILE }
         Mock ConvertTo-Json { '' } -Verifiable -ParameterFilter { $InputObject -is [System.Management.Automation.PSObject] }
 
         set_config 'does_not_exist' 'default'
@@ -65,17 +65,17 @@ Describe 'config' -Tag 'Scoop' {
     }
 
     It "set_config should remove a value if set to `$null" {
-        $SCOOP_CONFIGURATION = New-Object PSObject
-        $SCOOP_CONFIGURATION | Add-Member -MemberType NoteProperty -Name 'should_be_removed' -Value 'a_value'
-        $SCOOP_CONFIGURATION | Add-Member -MemberType NoteProperty -Name 'should_stay' -Value 'another_value'
-        $SCOOP_CONFIGURATION_FILE = "$PSScriptRoot\.scoop"
+        $SHOVEL_CONFIGURATION = New-Object PSObject
+        $SHOVEL_CONFIGURATION | Add-Member -MemberType NoteProperty -Name 'should_be_removed' -Value 'a_value'
+        $SHOVEL_CONFIGURATION | Add-Member -MemberType NoteProperty -Name 'should_stay' -Value 'another_value'
+        $SHOVEL_CONFIGURATION_FILE = "$PSScriptRoot\.scoop"
 
-        Mock Set-Content { } -Verifiable -ParameterFilter { $Path -eq $SCOOP_CONFIGURATION_FILE }
+        Mock Set-Content { } -Verifiable -ParameterFilter { $Path -eq $SHOVEL_CONFIGURATION_FILE }
         Mock ConvertTo-Json { '' } -Verifiable -ParameterFilter { $InputObject -is [System.Management.Automation.PSObject] }
 
-        $SCOOP_CONFIGURATION = set_config 'should_be_removed' $null
-        $SCOOP_CONFIGURATION.should_be_removed | Should -BeNullOrEmpty
-        $SCOOP_CONFIGURATION.should_stay | Should -Be 'another_value'
+        $SHOVEL_CONFIGURATION = set_config 'should_be_removed' $null
+        $SHOVEL_CONFIGURATION.should_be_removed | Should -BeNullOrEmpty
+        $SHOVEL_CONFIGURATION.should_stay | Should -Be 'another_value'
 
         Assert-VerifiableMock
     }

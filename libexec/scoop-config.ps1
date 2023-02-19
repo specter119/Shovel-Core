@@ -137,7 +137,7 @@ if ($Name -eq 'rm') {
     set_config $Value $null | Out-Null
     Write-UserMessage -Message "'$Value' has been removed"
 } elseif ($Name -eq 'show') {
-    Get-Content $SCOOP_CONFIGURATION_FILE -Raw
+    Get-Content $SHOVEL_CONFIGURATION_FILE -Raw
 } elseif ($null -ne $Value) {
     set_config $Name $Value | Out-Null
     Write-UserMessage -Message "'$Name' has been set to '$Value'"

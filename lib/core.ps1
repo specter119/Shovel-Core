@@ -248,42 +248,43 @@ function Test-IsArmArchitecture {
 
 #region TODO: Extract lib/Config.ps1
 function load_cfg($file) {
-    if (!(Test-Path $file)) { return $null }
+    if (!(Test-Path -LiteralPath $file -PathType 'Leaf')) { return $null }
 
     try {
-        return (Get-Content $file -Raw | ConvertFrom-Json -ErrorAction 'Stop')
+        return (Get-Content -LiteralPath $file -Raw | ConvertFrom-Json -ErrorAction 'Stop')
     } catch {
-        Write-UserMessage -Message "loading ${file}: $($_.Exception.Message)" -Err
+        Write-UserMessage -Message "Cannot load configuration file '${file}': $($_.Exception.Message)" -Err
+        return $null
     }
 }
 
 function get_config($name, $default) {
-    if (($null -eq $SCOOP_CONFIGURATION.$name) -and ($null -ne $default)) { return $default }
+    if (($null -eq $SHOVEL_CONFIGURATION.$name) -and ($null -ne $default)) { return $default }
 
-    return $SCOOP_CONFIGURATION.$name
+    return $SHOVEL_CONFIGURATION.$name
 }
 
 function set_config($name, $value) {
-    if ($null -eq $SCOOP_CONFIGURATION -or $SCOOP_CONFIGURATION.Count -eq 0) {
-        Split-Path -Path $SCOOP_CONFIGURATION_FILE | Confirm-DirectoryExistence | Out-Null
-        $SCOOP_CONFIGURATION = New-Object PSObject
-        $SCOOP_CONFIGURATION | Add-Member -MemberType 'NoteProperty' -Name $name -Value $value
+    if ($null -eq $SHOVEL_CONFIGURATION -or $SHOVEL_CONFIGURATION.Count -eq 0) {
+        Split-Path -Path $SHOVEL_CONFIGURATION_FILE | Confirm-DirectoryExistence > $null
+        $SHOVEL_CONFIGURATION = New-Object PSObject
+        $SHOVEL_CONFIGURATION | Add-Member -MemberType 'NoteProperty' -Name $name -Value $value
     } else {
         if ($value -eq [bool]::TrueString -or $value -eq [bool]::FalseString) {
             $value = [System.Convert]::ToBoolean($value)
         }
-        if ($null -eq $SCOOP_CONFIGURATION.$name) {
-            $SCOOP_CONFIGURATION | Add-Member -MemberType 'NoteProperty' -Name $name -Value $value
+        if ($null -eq $SHOVEL_CONFIGURATION.$name) {
+            $SHOVEL_CONFIGURATION | Add-Member -MemberType 'NoteProperty' -Name $name -Value $value
         } else {
-            $SCOOP_CONFIGURATION.$name = $value
+            $SHOVEL_CONFIGURATION.$name = $value
         }
     }
 
-    if ($null -eq $value) { $SCOOP_CONFIGURATION.PSObject.Properties.Remove($name) }
+    if ($null -eq $value) { $SHOVEL_CONFIGURATION.PSObject.Properties.Remove($name) }
 
-    ConvertTo-Json $SCOOP_CONFIGURATION -Depth 10 | Out-UTF8File -Path $SCOOP_CONFIGURATION_FILE
+    ConvertTo-Json $SHOVEL_CONFIGURATION -Depth 10 | Out-UTF8File -Path $SHOVEL_CONFIGURATION_FILE
 
-    return $SCOOP_CONFIGURATION
+    return $SHOVEL_CONFIGURATION
 }
 #endregion TODO: Extract lib/Config.ps1
 
@@ -1058,10 +1059,16 @@ $SCOOP_GLOBAL_MODULE_DIRECTORY = Join-Path $SCOOP_GLOBAL_ROOT_DIRECTORY 'modules
 # Directory for downloaded manifests (mainly)
 $SHOVEL_GENERAL_MANIFESTS_DIRECTORY = Join-Path $SCOOP_ROOT_DIRECTORY 'manifests'
 
-# Load Scoop config
+# Load configuration file
 $configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$SHOVEL_CONFIGURATION_FILE = Join-Path $configHome 'Shovel\config.json'
 $SCOOP_CONFIGURATION_FILE = Join-Path $configHome 'scoop\config.json'
-$SCOOP_CONFIGURATION = load_cfg $SCOOP_CONFIGURATION_FILE
+if ((!(Test-Path -LiteralPath $SHOVEL_CONFIGURATION_FILE -PathType 'Leaf')) -and (Test-Path -LiteralPath $SCOOP_CONFIGURATION_FILE -PathType 'Leaf')) {
+    # TODO: Migrate automatically after next release
+    $SHOVEL_CONFIGURATION_FILE = $SCOOP_CONFIGURATION_FILE
+}
+
+$SHOVEL_CONFIGURATION = load_cfg $SHOVEL_CONFIGURATION_FILE
 
 # General variables
 $SHOVEL_DEBUG_ENABLED = Test-ScoopDebugEnabled
@@ -1073,14 +1080,19 @@ $SHOVEL_USERAGENT = Get-UserAgent
 # All supported architectures
 $SHOVEL_SUPPORTED_ARCHITECTURES = @('64bit', '32bit', 'arm64')
 
+#region Deprecated
 # TODO: Remove deprecated variables
 $scoopdir = $SCOOP_ROOT_DIRECTORY
 $globaldir = $SCOOP_GLOBAL_ROOT_DIRECTORY
 $cachedir = $SCOOP_CACHE_DIRECTORY
-$scoopConfig = $SCOOP_CONFIGURATION
-$configFile = $SCOOP_CONFIGURATION_FILE
+$scoopConfig = $SHOVEL_CONFIGURATION
+$configFile = $SHOVEL_CONFIGURATION_FILE
 $modulesdir = $SCOOP_MODULE_DIRECTORY
 $bucketsdir = $SCOOP_BUCKETS_DIRECTORY
+
+$SCOOP_CONFIGURATION_FILE = $SHOVEL_CONFIGURATION_FILE
+$SCOOP_CONFIGURATION = $SHOVEL_CONFIGURATION
+#endregion Deprecated
 
 # Do not use the new native command parsing PowerShell/PowerShell#15239, Ash258/Scoop-Core#142
 $PSNativeCommandArgumentPassing = 'Legacy'

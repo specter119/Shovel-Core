@@ -430,7 +430,7 @@ function Test-ScoopConfigFile {
 
     $verdict = $true
 
-    if (!(Test-Path $SCOOP_CONFIGURATION_FILE)) {
+    if (!(Test-Path $SHOVEL_CONFIGURATION_FILE)) {
         Write-UserMessage -Message 'Configuration file does not exists.' -Warn
         Write-UserMessage -Message @(
             '  Fixable with running following commands:'
