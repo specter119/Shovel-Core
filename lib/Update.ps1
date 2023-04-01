@@ -37,7 +37,7 @@ function Update-ScoopCoreClone {
     Write-UserMessage -Message "Cloning scoop installation from $Repo ($Branch)" -Info
 
     $newDir = versiondir 'scoop' 'new'
-    Invoke-GitCmd -Command 'clone' -Argument '--quiet', '--depth', '1', '--single-branch', '--branch', """$Branch""", $Repo, """$newDir""" -Proxy
+    Invoke-GitCmd -Command 'clone' -Argument '--quiet', '--depth', '1', '--single-branch', '--branch', "$Branch", $Repo, "$newDir" -Proxy
 
     # Check if scoop was successful downloaded
     if (!(Test-Path -LiteralPath $newDir -PathType 'Container')) { Stop-ScoopExecution -Message 'Scoop update failed.' }
@@ -77,25 +77,25 @@ function Update-ScoopCorePull {
     $isBranchChanged = $currentBranch -ne $Branch
 
     # Change remote url if the repo is changed
-    if ($isRepoChanged) { Invoke-GitCmd @target -Cmd 'config' -Argument 'remote.origin.url', """$Repo""" }
+    if ($isRepoChanged) { Invoke-GitCmd @target -Cmd 'config' -Argument 'remote.origin.url', "$Repo" }
 
     # Fetch and reset local repo if the repo or the branch is changed
     if ($isRepoChanged -or $isBranchChanged) {
         Write-UserMessage -Message "Switching to $Repo ($Branch)" -Info
         # Reset git fetch refs, so that it can fetch all branches (GH-3368)
-        Invoke-GitCmd @target -Command 'config' -Argument 'remote.origin.fetch', '"+refs/heads/*:refs/remotes/origin/*"'
+        Invoke-GitCmd @target -Command 'config' -Argument 'remote.origin.fetch', '+refs/heads/*:refs/remotes/origin/*'
         # Fetch remote branch
-        Invoke-GitCmd @target -Command 'fetch' -Argument '--quiet', '--force', 'origin', """refs/heads/${Branch}:refs/remotes/origin/$Branch""" -Proxy
+        Invoke-GitCmd @target -Command 'fetch' -Argument '--quiet', '--force', 'origin', "refs/heads/${Branch}:refs/remotes/origin/$Branch" -Proxy
         # Checkout and track the branch
-        Invoke-GitCmd @target -Command 'checkout' -Argument '--quiet', '-B', """$Branch""", '--track', """origin/$Branch""" -Proxy
+        Invoke-GitCmd @target -Command 'checkout' -Argument '--quiet', '-B', "$Branch", '--track', "origin/$Branch" -Proxy
         # Reset branch HEAD
-        Invoke-GitCmd @target -Command 'reset' -Argument '--quiet', '--hard', """origin/$Branch"""
+        Invoke-GitCmd @target -Command 'reset' -Argument '--quiet', '--hard', "origin/$Branch"
     } else {
         Invoke-GitCmd @target -Command 'Update' -Argument '--quiet' -Proxy
     }
 
     $res = $LASTEXITCODE
-    if ($SHOW_UPDATE_LOG) { Invoke-GitCmd @target -Command 'UpdateLog' -Argument """$previousCommit..HEAD""" }
+    if ($SHOW_UPDATE_LOG) { Invoke-GitCmd @target -Command 'UpdateLog' -Argument "$previousCommit..HEAD" }
 
     if ($res -ne 0) { Stop-ScoopExecution -Message 'Update failed.' }
 }
@@ -122,7 +122,7 @@ function Update-ScoopLocalBucket {
             $previousCommit = Invoke-GitCmd @target -Command 'CurrentCommit'
             Invoke-GitCmd @target -Command 'Update' -Argument '--quiet' -Proxy
 
-            if ($SHOW_UPDATE_LOG) { Invoke-GitCmd @target -Command 'UpdateLog' -Argument """$previousCommit..HEAD""" }
+            if ($SHOW_UPDATE_LOG) { Invoke-GitCmd @target -Command 'UpdateLog' -Argument "$previousCommit..HEAD" }
         }
     }
 }
@@ -395,8 +395,8 @@ function Update-App {
         }
     }
 
-    Install-ScoopApplication -ResolvedObject $applicationToUpdate -Architecture $architecture -Global:$Global -Suggested:$Suggested `
-        -UseCache:$useCache -CheckHash:$checkHash -InstallationInformation $install
+    Install-ScoopApplication -ResolvedObject $applicationToUpdate -Architecture $architecture -Global:$Global `
+        -Suggested:$Suggested -UseCache:$useCache -CheckHash:$checkHash -InstallationInformation $install
 }
 
 $__importedUpdate__ = $true

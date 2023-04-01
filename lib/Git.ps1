@@ -22,6 +22,7 @@ function Invoke-GitCmd {
     .PARAMETER Argument
         Specifies additional arguments, which should be used.
     #>
+    # TODO: Add progress parameter/indication
     param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [Alias('Cmd', 'Action')]
@@ -32,12 +33,18 @@ function Invoke-GitCmd {
     )
 
     begin {
+        # Global options
         $preAction = @()
         if ($Repository) {
             $Repository = $Repository.TrimEnd('\').TrimEnd('/')
-            $preAction = @('-C', """$Repository""")
+            $preAction = @('-C', "$Repository")
         }
         $preAction += '--no-pager'
+
+        if ($Proxy -and $SHOVEL_IS_PROXY_ENABLED) {
+            $prox = get_config 'proxy'
+            $preAction += @('-c', "http.proxy=$prox", '-c', "https.proxy=$prox")
+        }
     }
 
     process {
@@ -49,17 +56,18 @@ function Invoke-GitCmd {
             'Update' {
                 $action = 'pull'
                 $Argument += '--rebase=false'
+                $Proxy = $true
             }
             'UpdateLog' {
                 $action = 'log'
                 $para = @(
-                    '--no-decorate'
-                    '--format="tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset"'
-                    '--regexp-ignore-case'
-                    '--extended-regexp'
                     '--invert-grep'
+                    '--extended-regexp'
+                    '--regexp-ignore-case'
+                    '--no-decorate'
                     '--grep="\[(scoop|shovel) skip\]"' # Ignore [scoop skip] [shovel skip]
                     '--grep="^Merge [pcb]"' # Ignore merge commits
+                    '--format="tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset"'
                 )
                 $Argument = $para + $Argument
             }
@@ -70,18 +78,11 @@ function Invoke-GitCmd {
             default { $action = $Command }
         }
 
-        $commandToRun = $commandToRunNix = $commandToRunWindows = ('git', ($preAction -join ' '), $action, ($Argument -join ' ')) -join ' '
+        $commandToRun = ('git', ($preAction -join ' '), $action, ($Argument -join ' ')) -join ' '
+        debug $commandToRun
 
-        if ($Proxy) {
-            $prox = get_config 'proxy' 'none'
-
-            if ($prox -and ($prox -ne 'none')) {
-                $keyword = if ($SHOVEL_IS_UNIX) { 'export' } else { 'SET' }
-                $commandToRunWindows = $commandToRunNix = "$keyword HTTPS_PROXY=$prox&&$keyword HTTP_PROXY=$prox&&$commandToRun"
-            }
-        }
-
-        Invoke-SystemComSpecCommand -Windows $commandToRunWindows -Unix $commandToRunNix
+        git @preAction $action @Argument
+        if ($LASTEXITCODE -ne 0) { throw [ScoopException]::new('Cannot process git command') }
     }
 }
 

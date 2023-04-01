@@ -93,7 +93,6 @@ if ($Resolved.Bucket) {
 
     if ($path) {
         try {
-            # TODO: Quote
             $_u = Invoke-GitCmd -Repository $path -Command 'config' -Argument @('--get', 'remote.origin.url')
             if ($LASTEXITCODE -ne 0) { throw 'Ignore' }
             if ($_u) { $_m = "$_m ($_u)" }

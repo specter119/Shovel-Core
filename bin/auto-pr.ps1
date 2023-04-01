@@ -94,7 +94,7 @@ function _gitWrapper {
 }
 
 function _selectMasterBranch {
-    $branches = _gitWrapper @splat -Command 'branch' -Argument '--all'
+    $branches = _gitWrapper @splatRepo -Command 'branch' -Argument '--all'
     $master = if ($branches -like '* remotes/origin/main') { 'main' } else { 'master' }
 
     return $master
@@ -167,16 +167,16 @@ if (($RepositoryRoot.BaseName -eq 'bucket') -and (!(Join-Path $RepositoryRoot '.
 
 $RepositoryRoot = $RepositoryRoot.TrimEnd('/').TrimEnd('\') # Just in case
 $repoContext = "-C ""$RepositoryRoot"""
-$splat = @{ 'Repository' = $RepositoryRoot }
+$splatRepo = @{ 'Repository' = $RepositoryRoot }
 
 Write-UserMessage -Message 'Updating ...' -ForegroundColor 'DarkCyan'
 $master = _selectMasterBranch
 if ($Push) {
-    _gitWrapper @splat -Command 'pull' -Argument 'origin', $master -Proxy
-    _gitWrapper @splat -Command 'checkout' -Argument $master
+    _gitWrapper @splatRepo -Command 'pull' -Argument 'origin', $master -Proxy
+    _gitWrapper @splatRepo -Command 'checkout' -Argument $master
 } else {
-    _gitWrapper @splat -Command 'pull' -Argument 'upstream', $master -Proxy
-    _gitWrapper @splat -Command 'push' -Argument 'origin', $master -Proxy
+    _gitWrapper @splatRepo -Command 'pull' -Argument 'upstream', $master -Proxy
+    _gitWrapper @splatRepo -Command 'push' -Argument 'origin', $master -Proxy
 }
 
 if (!$SkipCheckver) {
@@ -190,7 +190,7 @@ if (!$SkipCheckver) {
 }
 
 # Iterate only in bucket/* and ignore bucket/old/*
-$manifestsToUpdate = _gitWrapper @splat -Command 'diff' -Argument '--name-only'
+$manifestsToUpdate = _gitWrapper @splatRepo -Command 'diff' -Argument '--name-only'
 $manifestsToUpdate = $manifestsToUpdate | Where-Object { $_ -like 'bucket/*' }
 $manifestsToUpdate = $manifestsToUpdate | Where-Object { $_ -notlike 'bucket/old/*' }
 
@@ -220,31 +220,30 @@ foreach ($changedFile in $manifestsToUpdate) {
     if ($Push) {
         Write-UserMessage -Message "Creating update $applicationName ($version) ..." -ForegroundColor 'DarkCyan'
 
-        _gitWrapper @splat -Command 'add' -Argument """$changedFile"""
+        _gitWrapper @splatRepo -Command 'add' -Argument $changedFile
 
         # Archiving
         $archived = $false
         if ($manifestObject.autoupdate.archive -and ($manifestObject.autoupdate.archive -eq $true)) {
             $oldAppPath = Join-Path $Dir "old\$applicationName"
-            $oldVersionManifest = @(_gitWrapper @splat -Command 'ls-files' -Argument '--other', '--exclude-standard') | Where-Object { $_ -like "bucket/old/$applicationName/*" }
+            $oldVersionManifest = @(_gitWrapper @splatRepo -Command 'ls-files' -Argument '--other', '--exclude-standard') | Where-Object { $_ -like "bucket/old/$applicationName/*" }
 
             if ($oldVersionManifest) {
-                _gitWrapper @splat -Command 'add' -Argument """$oldVersionManifest"""
+                _gitWrapper @splatRepo -Command 'add' -Argument $oldVersionManifest
                 $oldVersion = (Join-Path $RepositoryRoot $oldVersionManifest | Get-Item).BaseName
                 $archived = $true
             }
         }
 
         # Detect if file was staged, because it's not when only LF or CRLF have changed
-        $status = _gitWrapper @splat -Command 'status' -Argument '--porcelain', '--untracked-files=no'
+        $status = _gitWrapper @splatRepo -Command 'status' -Argument '--porcelain', '--untracked-files=no'
         $status = $status | Where-Object { $_ -match "M\s{2}.*$($gci.Name)" }
         if ($status -and $status.StartsWith('M  ') -and $status.EndsWith($gci.Name)) {
-            $delim = if ($SHOVEL_IS_UNIX) { '""' } else { '"' }
-            $commitA = '--message', "$delim${applicationName}: Update to version $version$delim"
+            $commitA = '--message', "${applicationName}: Update to version $version"
             if ($archived) {
-                $commitA += '--message', "${delim}Archive version $oldVersion$delim"
+                $commitA += '--message', "Archive version $oldVersion"
             }
-            _gitWrapper @splat -Command 'commit' -Argument $commitA
+            _gitWrapper @splatRepo -Command 'commit' -Argument $commitA
         } else {
             Write-UserMessage -Message "Skipping $applicationName because only LF/CRLF changes were detected ..." -Info
         }
@@ -255,13 +254,13 @@ foreach ($changedFile in $manifestsToUpdate) {
 
 if ($Push) {
     Write-UserMessage -Message 'Pushing updates ...' -ForegroundColor 'DarkCyan'
-    _gitWrapper @splat -Command 'push' -Argument 'origin', $master -Proxy
+    _gitWrapper @splatRepo -Command 'push' -Argument 'origin', $master -Proxy
 } else {
     Write-UserMessage -Message "Returning to $master branch and removing unstaged files ..." -ForegroundColor 'DarkCyan'
-    _gitWrapper @splat -Command 'checkout' -Argument '--force', $master -Proxy
+    _gitWrapper @splatRepo -Command 'checkout' -Argument '--force', $master -Proxy
 }
 
-_gitWrapper @splat -Command 'reset' -Argument '--hard'
+_gitWrapper @splatRepo -Command 'reset' -Argument '--hard'
 
 if ($problems -gt 0) { $exitCode = 10 + $problems }
 exit $exitCode

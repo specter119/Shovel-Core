@@ -1075,6 +1075,7 @@ $SHOVEL_DEBUG_ENABLED = Test-ScoopDebugEnabled
 $SHOVEL_IS_UNIX = Test-IsUnix
 $SHOVEL_IS_ADMIN = is_admin
 $SHOVEL_IS_ARM_ARCH = Test-IsArmArchitecture
+$SHOVEL_IS_PROXY_ENABLED = (get_config 'proxy' 'never') -notin ('never', 'none')
 $SHOVEL_USERAGENT = Get-UserAgent
 
 # All supported architectures
