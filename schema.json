@@ -188,6 +188,15 @@
                 "url": {
                     "description": "Specifies the URL of webpage/file which contains information about file integrity.",
                     "$ref": "#/definitions/autoupdateHashUrl"
+                },
+                "find": {
+                    "description": "Alias for 'regex' in hash extraction (deprecated).",
+                    "type": "string",
+                    "format": "regex"
+                },
+                "jp": {
+                    "description": "Alias for 'jsonpath' in hash extraction (deprecated).",
+                    "$ref": "#/definitions/jsonPathExpression"
                 }
             }
         },
@@ -285,16 +294,34 @@
             "additionalProperties": false,
             "properties": {
                 "url": {
-                    "description": "Specifies URL to be updated.",
-                    "$ref": "#/definitions/autoupdateUrl"
+                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
                 },
                 "hash": {
-                    "description": "Specifies how hashes are extracted.",
-                    "$ref": "#/definitions/hashExtraction"
+                    "$ref": "#/definitions/hashExtractionOrArrayOfHashExtractions"
                 },
                 "extract_dir": {
                     "description": "Specifies extract directory to be updated.",
                     "type": "string"
+                },
+                "bin": {
+                    "description": "Specifies executables to be available in PATH.",
+                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },
+                "env_add_path": {
+                    "description": "Specifies directories to be added to PATH.",
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "env_set": {
+                    "description": "Specifies environment variables to set.",
+                    "$ref": "#/definitions/objectWithStringOnly"
+                },
+                "installer": {
+                    "description": "Specifies installer configuration.",
+                    "$ref": "#/definitions/installerProp"
+                },
+                "shortcuts": {
+                    "description": "Specifies Start Menu shortcuts.",
+                    "$ref": "#/definitions/arrayOfArrayOfStrings"
                 }
             }
         },
@@ -456,6 +483,34 @@
                         "disable": {
                             "description": "Specifies to not execute checkver script without deleting whole property. Forcing checkver will ignore this setting.",
                             "type": "boolean"
+                        },
+                        "sourceforge": {
+                            "description": "Specifies the SourceForge project to check for latest version.",
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "project": {
+                                            "type": "string"
+                                        },
+                                        "path": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "re": {
+                            "description": "Alias for 'regex' (deprecated).",
+                            "type": "string",
+                            "format": "regex"
+                        },
+                        "jp": {
+                            "description": "Alias for 'jsonpath' (deprecated).",
+                            "$ref": "#/definitions/jsonPathExpression"
                         }
                     }
                 }
@@ -502,18 +557,82 @@
                     }
                 },
                 "url": {
-                    "description": "Specifies the URL to be updated",
-                    "$ref": "#/definitions/autoupdateUrl"
+                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
                 },
                 "hash": {
-                    "description": "Specifies how the hashes are extracted",
-                    "$ref": "#/definitions/hashExtraction"
+                    "$ref": "#/definitions/hashExtractionOrArrayOfHashExtractions"
                 },
                 "extract_dir": {
                     "description": "Specifies to update 'extract_dir' property.",
                     "type": "string"
+                },
+                "bin": {
+                    "description": "Specifies executables to be available in PATH.",
+                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },
+                "env_add_path": {
+                    "description": "Specifies directories to be added to PATH.",
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "env_set": {
+                    "description": "Specifies environment variables to set.",
+                    "$ref": "#/definitions/objectWithStringOnly"
+                },
+                "installer": {
+                    "description": "Specifies installer configuration.",
+                    "$ref": "#/definitions/installerProp"
+                },
+                "shortcuts": {
+                    "description": "Specifies Start Menu shortcuts.",
+                    "$ref": "#/definitions/arrayOfArrayOfStrings"
+                },
+                "persist": {
+                    "description": "Specifies directories/files to persist across updates.",
+                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },
+                "psmodule": {
+                    "description": "Specifies PowerShell module configuration.",
+                    "$ref": "#/definitions/psmoduleProp"
+                },
+                "license": {
+                    "description": "Specifies the license.",
+                    "$ref": "#/definitions/licenseProp"
+                },
+                "notes": {
+                    "description": "Specifies the message displayed after installation (Scoop-compatible alias for 'note').",
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
                 }
             }
+        },
+        "hashExtractionOrArrayOfHashExtractions": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/hashExtraction"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/hashExtraction"
+                    },
+                    "minItems": 1
+                }
+            ]
+        },
+        "autoupdateUriOrArrayOfAutoupdateUris": {
+            "anyOf": [
+                {
+                    "type": "string",
+                    "format": "uri"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "minItems": 1
+                }
+            ]
         }
     },
     "properties": {
@@ -661,6 +780,10 @@
         "autoupdate": {
             "description": "Specifies the process of updating manifest with newer version detected by 'checkver'.",
             "$ref": "#/definitions/autoupdateProp"
+        },
+        "_comment": {
+            "description": "Deprecated. Use ## instead.",
+            "$ref": "#/definitions/stringOrArrayOfStrings"
         }
     }
 }

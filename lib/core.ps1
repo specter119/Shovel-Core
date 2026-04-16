@@ -1008,6 +1008,35 @@ function warn($msg) { Write-UserMessage -Message $msg -Warning }
 function info($msg) { Write-UserMessage -Message $msg -Info }
 function message($msg) { Write-UserMessage -Message $msg -SkipSeverity }
 function success($msg) { Write-UserMessage -Message $msg -Success }
+
+# Compatibility wrappers for upstream Scoop callers (e.g. during self-update transition)
+function Invoke-Git {
+    param(
+        [Alias('PSPath', 'Path')]
+        [String] $WorkingDirectory,
+        [Alias('Args')]
+        [String[]] $ArgumentList
+    )
+    $gitArgs = @()
+    if ($WorkingDirectory) { $gitArgs += '-C', $WorkingDirectory }
+    $gitArgs += $ArgumentList
+    git @gitArgs
+}
+
+function Invoke-GitLog {
+    param(
+        [Parameter(Mandatory)]
+        [String] $Path,
+        [Parameter(Mandatory)]
+        [String] $CommitHash,
+        [String] $Name = ''
+    )
+    if ($Name) {
+        if ($Name.Length -gt 12) { $Name = "$($Name.Substring(0, 10)).." }
+        $Name = "%Cgreen$($Name.PadRight(12, ' ').Substring(0, 12))%Creset "
+    }
+    Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format=tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset", "$CommitHash..HEAD")
+}
 #endregion Deprecated
 
 #region Main

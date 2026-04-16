@@ -125,7 +125,7 @@ function Invoke-Check {
 
         next $appName "$($err.Message)`r`nURL $url is not valid"
     }
-    if (!$regex -and $replace) { next $appName "'replace' requires 'regex'" }
+    if (!$regexp -and $replace) { next $appName "'replace' requires 'regex'" }
 
     if ($jsonpath) {
         # TODO: Refactor Json-Path
